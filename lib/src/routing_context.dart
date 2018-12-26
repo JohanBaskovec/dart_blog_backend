@@ -24,7 +24,7 @@ abstract class RoutingContext {
   void closeResponse();
 
   /// Gets or create a BlogPostRepository
-  BlogPostRepository get blogPostRepository;
+  Future<BlogPostRepository> get blogPostRepository;
 
   /// Gets a JsonEncoder
   JsonEncoder get jsonEncoder;

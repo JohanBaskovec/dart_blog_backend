@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
 import 'package:blog_backend/src/blog/repository/blog_post_repository_impl.dart';
 import 'package:blog_backend/src/routing_context.dart';
+import 'package:postgres/postgres.dart';
 
 /// A routing context. Wraps a dart:io HttpRequest, simplifies
 /// responding to requests and is a service locator.
@@ -11,6 +12,15 @@ class RoutingContextImpl implements RoutingContext {
   HttpRequest _request;
   JsonEncoder _jsonEncoder;
   BlogPostRepository _blogPostRepository;
+  PostgreSQLConnection _connection;
+
+  // TODO: connection pool
+  // TODO: transactions
+  Future<void> _openPostgresConnection() async {
+    _connection = PostgreSQLConnection('localhost', 5432, 'postgres',
+        username: 'postgres', password: 'c4ef37c0fbd747da1c63c0f87d7c62df');
+    await _connection.open();
+  }
 
   /// Creates a next RoutingContext from a dart:io HttpRequest
   RoutingContextImpl(this._request, this._jsonEncoder);
@@ -34,12 +44,18 @@ class RoutingContextImpl implements RoutingContext {
 
   @override
   void closeResponse() {
+    if (_connection != null) {
+      _connection.close();
+    }
     _request.response.close();
   }
 
   @override
-  BlogPostRepository get blogPostRepository {
-    return _blogPostRepository ??= BlogPostRepositoryImpl();
+  Future<BlogPostRepository> get blogPostRepository async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _blogPostRepository ??= BlogPostRepositoryImpl(_connection);
   }
 
   @override

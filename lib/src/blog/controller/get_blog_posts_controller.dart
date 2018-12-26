@@ -9,7 +9,7 @@ import 'package:blog_common/blog_common.dart';
 class GetBlogPostsController extends Controller {
   @override
   Future<void> get(RoutingContext routingContext) async {
-    final BlogPostRepository blogPostRepository = routingContext.blogPostRepository;
+    final BlogPostRepository blogPostRepository = await routingContext.blogPostRepository;
     final List<BlogPost> blogPosts = await blogPostRepository.getAll();
     routingContext.okJsonResponse(blogPosts);
   }
