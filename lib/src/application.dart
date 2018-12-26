@@ -1,0 +1,21 @@
+import 'dart:io';
+
+import 'package:blog_backend/src/blog/controller/get_blog_posts_controller.dart';
+import 'package:blog_backend/src/routing/route.dart';
+import 'package:blog_backend/src/routing/route_holder.dart';
+import 'package:blog_backend/src/routing/router.dart';
+import 'package:blog_backend/src/routing_context_impl.dart';
+
+/// Run the application.
+Future<void> run() async {
+  final HttpServer server =
+  await HttpServer.bind(InternetAddress.anyIPv6, 8082);
+  final getBlogPostsController = GetBlogPostsController();
+  final router = Router(RouteHolder([
+    Route('/posts', getBlogPostsController)
+  ]));
+  server.listen((HttpRequest request) async {
+    final routingContext = RoutingContextImpl(request);
+    await router.routeToPath(request.uri.path, routingContext);
+  });
+}

@@ -1,5 +1,9 @@
+import 'package:blog_backend/src/routing_context.dart';
+
 /// Backend controller.
 abstract class Controller {
   /// Run.
-  void run();
+  Future<void> run(RoutingContext routingContext) async {
+
+  }
 }

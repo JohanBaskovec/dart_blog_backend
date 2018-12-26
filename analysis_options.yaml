@@ -144,7 +144,7 @@ linter:
   rules:
   # from https://github.com/dart-lang/linter/blob/master/example/all.yaml
   - always_declare_return_types
-  - always_put_control_body_on_new_line
+  #- always_put_control_body_on_new_line
   - always_put_required_named_parameters_first
   - always_require_non_null_named_parameters
   #- always_specify_types
@@ -252,7 +252,7 @@ linter:
   - throw_in_finally
   - type_annotate_public_apis
   - type_init_formals
-  - unawaited_futures
+  #- unawaited_futures
   - unnecessary_brace_in_string_interps
   - unnecessary_const
   - unnecessary_getters_setters
