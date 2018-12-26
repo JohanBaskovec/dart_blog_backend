@@ -1,0 +1,15 @@
+name: blog_backend
+description: Backend
+
+environment:
+  sdk: '>=2.1.0 <3.0.0'
+
+dependencies:
+  args: ^1.4.2
+  shelf: ^0.7.2
+  blog_common:
+    path: ../dart_blog_common
+
+dev_dependencies:
+  test: ^1.0.0
+  mockito: ^4.0.0
