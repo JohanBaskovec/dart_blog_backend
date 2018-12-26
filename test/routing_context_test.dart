@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_backend/src/routing_context_impl.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -7,14 +8,24 @@ import 'package:test/test.dart';
 import 'mocks.dart';
 
 void main() {
+  MockHttpRequest request;
+  // ignore: close_sinks
+  MockHttpResponse response;
+  MockHttpHeaders headers;
+  MockJsonEncoder jsonEncoder;
+  RoutingContext routingContext;
+  setUp(() {
+    request = MockHttpRequest();
+    response = MockHttpResponse();
+    when(request.response).thenReturn(response);
+    headers = MockHttpHeaders();
+    when(response.headers).thenReturn(headers);
+    jsonEncoder = MockJsonEncoder();
+    routingContext = RoutingContextImpl(request, jsonEncoder);
+  });
+
   group('setJsonContentType', () {
     test('should set the content type to application/json; charset=utf-8', () {
-      final request = MockHttpRequest();
-      // ignore: close_sinks
-      final response = MockHttpResponse();
-      when(request.response).thenReturn(response);
-      final headers = MockHttpHeaders();
-      when(response.headers).thenReturn(headers);
       final expectedContentType =
           ContentType('application', 'json', charset: 'utf-8');
       ContentType receivedContentType;
@@ -24,8 +35,6 @@ void main() {
               invocation.positionalArguments[0] as ContentType;
         }
       });
-      when(request.response).thenReturn(response);
-      final routingContext = RoutingContextImpl(request);
       routingContext.setJsonContentType();
       expect(
           receivedContentType.mimeType, equals(expectedContentType.mimeType));
@@ -37,11 +46,6 @@ void main() {
   });
   group('okResponse', () {
     test('should set the status code to 200 and set the body', () {
-      final request = MockHttpRequest();
-      // ignore: close_sinks
-      final response = MockHttpResponse();
-      when(request.response).thenReturn(response);
-      final routingContext = RoutingContextImpl(request);
       routingContext.okResponse('hello world');
       verify(response.statusCode = 200);
       verify(response.write('hello world'));
@@ -49,11 +53,6 @@ void main() {
   });
   group('close', () {
     test('should close the response', () {
-      final request = MockHttpRequest();
-      // ignore: close_sinks
-      final response = MockHttpResponse();
-      when(request.response).thenReturn(response);
-      final routingContext = RoutingContextImpl(request);
       routingContext.closeResponse();
       verify(response.close());
     });
