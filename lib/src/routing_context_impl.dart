@@ -52,4 +52,10 @@ class RoutingContextImpl implements RoutingContext {
   void notFoundResponse() {
     _request.response.statusCode = HttpStatus.notFound;
   }
+
+  @override
+  void okJsonResponse(dynamic objects) {
+    final String json = jsonEncoder.convert(objects);
+    okResponse(json);
+  }
 }

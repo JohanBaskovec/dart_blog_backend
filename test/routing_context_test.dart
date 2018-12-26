@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_backend/src/routing_context_impl.dart';
+import 'package:blog_common/blog_common.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -51,6 +52,17 @@ void main() {
       verify(response.write('hello world'));
     });
   });
+  group('okJsonResponse', () {
+    test('should set the status code to 200, convert to json and set the body', () {
+      final blogPost = BlogPost(title: 'title0', content: 'content0');
+      const String json = '{"title": "title0", "content": "content0"}';
+      when(jsonEncoder.convert(blogPost)).thenReturn(json);
+      routingContext.okJsonResponse(blogPost);
+      verify(response.statusCode = 200);
+      verify(response.write(json));
+    });
+  });
+
   group('close', () {
     test('should close the response', () {
       routingContext.closeResponse();

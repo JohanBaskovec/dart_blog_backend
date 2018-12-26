@@ -10,10 +10,8 @@ class GetBlogPostsController extends Controller {
   @override
   Future<void> get(RoutingContext routingContext) async {
     final BlogPostRepository blogPostRepository = routingContext.blogPostRepository;
-    final JsonEncoder jsonEncoder = routingContext.jsonEncoder;
     final List<BlogPost> blogPosts = await blogPostRepository.getAll();
-    final json = jsonEncoder.convert(blogPosts);
-    routingContext.okResponse(json);
+    routingContext.okJsonResponse(blogPosts);
   }
 }
 

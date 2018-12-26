@@ -16,6 +16,9 @@ abstract class RoutingContext {
   /// Responds with a code 200.
   void okResponse(String body);
 
+  /// Attempts to convert [objects] to JSON and respond with a code 200.
+  void okJsonResponse(dynamic objects);
+
   /// Closes the response. You generally don't need to call this
   /// method manually, the Router does it at the end of each request.
   void closeResponse();
