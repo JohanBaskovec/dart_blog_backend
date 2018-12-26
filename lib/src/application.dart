@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:blog_backend/src/blog/controller/get_blog_posts_controller.dart';
@@ -11,11 +12,12 @@ Future<void> run() async {
   final HttpServer server =
   await HttpServer.bind(InternetAddress.anyIPv6, 8082);
   final getBlogPostsController = GetBlogPostsController();
+  const JsonEncoder jsonEncoder = JsonEncoder();
   final router = Router(RouteHolder([
     Route('/posts', getBlogPostsController)
   ]));
   server.listen((HttpRequest request) async {
-    final routingContext = RoutingContextImpl(request);
+    final routingContext = RoutingContextImpl(request, jsonEncoder);
     await router.routeToPath(request.uri.path, routingContext);
   });
 }

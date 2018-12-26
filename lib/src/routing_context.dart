@@ -1,4 +1,6 @@
-import 'dart:io';
+import 'dart:convert';
+
+import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
 
 /// Routing context
 abstract class RoutingContext {
@@ -10,4 +12,11 @@ abstract class RoutingContext {
 
   /// Close the response.
   void closeResponse();
+
+  /// Get or create a BlogPostRepository
+  BlogPostRepository get blogPostRepository;
+
+  /// Get a JsonEncoder
+  JsonEncoder get jsonEncoder;
 }
+
