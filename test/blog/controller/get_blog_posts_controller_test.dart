@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks.dart';
 
 void main() {
-  group('run', () {
+  group('get', () {
     test('should return all blog posts', () async {
       final controller = GetBlogPostsController();
       final routingContext = MockRoutingContext();
@@ -22,7 +22,7 @@ void main() {
       when(routingContext.jsonEncoder).thenReturn(jsonEncoder);
       when(blogPostRepository.getAll()).thenAnswer((_) async => blogPosts);
       when(routingContext.blogPostRepository).thenReturn(blogPostRepository);
-      await controller.run(routingContext);
+      await controller.get(routingContext);
       verify(routingContext.okResponse(json));
     });
   });

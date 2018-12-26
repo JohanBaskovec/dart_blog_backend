@@ -15,7 +15,6 @@ class RoutingContextImpl implements RoutingContext {
   /// Creates a next RoutingContext from a dart:io HttpRequest
   RoutingContextImpl(this._request, this._jsonEncoder);
 
-  /// Set the content type to application/json utf-8
   @override
   void setJsonContentType() {
     _request.response.headers.contentType =
@@ -24,8 +23,13 @@ class RoutingContextImpl implements RoutingContext {
 
   @override
   void okResponse(String body) {
-    _request.response.statusCode = 200;
+    _request.response.statusCode = HttpStatus.ok;
     _request.response.write(body);
+  }
+
+  @override
+  void methodNotAllowedResponse() {
+    _request.response.statusCode = HttpStatus.methodNotAllowed;
   }
 
   @override
@@ -40,4 +44,12 @@ class RoutingContextImpl implements RoutingContext {
 
   @override
   JsonEncoder get jsonEncoder => _jsonEncoder;
+
+  @override
+  String get method => _request.method;
+
+  @override
+  void notFoundResponse() {
+    _request.response.statusCode = HttpStatus.notFound;
+  }
 }

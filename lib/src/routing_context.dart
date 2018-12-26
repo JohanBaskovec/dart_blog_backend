@@ -4,19 +4,29 @@ import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
 
 /// Routing context
 abstract class RoutingContext {
-  /// Set the content type to application/json utf-8
+  /// Sets the content type to application/json utf-8
   void setJsonContentType();
 
-  /// Respond with a code 200.
+  /// Responds with code 405 Method Not Allowed.
+  void methodNotAllowedResponse();
+
+  /// Responds with code 404.
+  void notFoundResponse();
+
+  /// Responds with a code 200.
   void okResponse(String body);
 
-  /// Close the response.
+  /// Closes the response. You generally don't need to call this
+  /// method manually, the Router does it at the end of each request.
   void closeResponse();
 
-  /// Get or create a BlogPostRepository
+  /// Gets or create a BlogPostRepository
   BlogPostRepository get blogPostRepository;
 
-  /// Get a JsonEncoder
+  /// Gets a JsonEncoder
   JsonEncoder get jsonEncoder;
+
+  /// Gets the method.
+  String get method;
 }
 
