@@ -1,38 +1,84 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
+import 'package:blog_backend/src/utf8_stream_converter.dart';
+import 'package:postgres/postgres.dart';
 
-/// Routing context
-abstract class RoutingContext {
+/// A routing context. Wraps a dart:io HttpRequest, simplifies
+/// responding to requests and is a service locator.
+class RoutingContext {
+  HttpRequest _request;
+  JsonEncoder _jsonEncoder;
+  BlogPostRepository _blogPostRepository;
+  PostgreSQLConnection _connection;
+  Utf8StreamConverter _utf8StreamParser;
+
+  // TODO: connection pool
+  // TODO: transactions
+  Future<void> _openPostgresConnection() async {
+    _connection = PostgreSQLConnection('localhost', 5432, 'postgres',
+        username: 'postgres', password: 'c4ef37c0fbd747da1c63c0f87d7c62df');
+    await _connection.open();
+  }
+
+  /// Creates a next RoutingContext from a dart:io HttpRequest
+  RoutingContext(this._request, this._jsonEncoder, this._utf8StreamParser);
+
   /// Sets the content type to application/json utf-8
-  void setJsonContentType();
-
-  /// Responds with code 405 Method Not Allowed.
-  void methodNotAllowedResponse();
-
-  /// Responds with code 404.
-  void notFoundResponse();
+  void setJsonContentType() {
+    _request.response.headers.contentType =
+        ContentType('application', 'json', charset: 'utf-8');
+  }
 
   /// Responds with a code 200.
-  void okResponse(String body);
+  void okResponse(String body) {
+    _request.response.statusCode = HttpStatus.ok;
+    _request.response.write(body);
+  }
 
-  /// Attempts to convert [objects] to JSON and respond with a code 200.
-  void okJsonResponse(dynamic objects);
+  /// Responds with code 405 Method Not Allowed.
+  void methodNotAllowedResponse() {
+    _request.response.statusCode = HttpStatus.methodNotAllowed;
+  }
 
   /// Closes the response. You generally don't need to call this
   /// method manually, the Router does it at the end of each request.
-  void closeResponse();
+  void closeResponse() {
+    if (_connection != null) {
+      _connection.close();
+    }
+    _request.response.close();
+  }
 
   /// Gets or create a BlogPostRepository
-  Future<BlogPostRepository> get blogPostRepository;
+  Future<BlogPostRepository> get blogPostRepository async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _blogPostRepository ??= BlogPostRepository(_connection);
+  }
 
   /// Gets a JsonEncoder
-  JsonEncoder get jsonEncoder;
+  JsonEncoder get jsonEncoder => _jsonEncoder;
 
   /// Gets the method.
-  String get method;
+  String get method => _request.method;
+
+  /// Responds with code 404.
+  void notFoundResponse() {
+    _request.response.statusCode = HttpStatus.notFound;
+  }
+
+  /// Attempts to convert [objects] to JSON and respond with a code 200.
+  void okJsonResponse(dynamic objects) {
+    final String json = jsonEncoder.convert(objects);
+    okResponse(json);
+  }
 
   /// Returns the body as a JSON object.
-  Future<dynamic> get bodyAsJson;
+  Future<dynamic> get bodyAsJson {
+    return _utf8StreamParser.streamToJson(_request);
+  }
 }
 

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:blog_backend/src/routing_context.dart';
-import 'package:blog_backend/src/routing_context_impl.dart';
 import 'package:blog_common/blog_common.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -25,7 +24,7 @@ void main() {
     jsonEncoder = MockJsonEncoder();
     utf8StreamConverter = MockUtf8StreamConverter();
     routingContext =
-        RoutingContextImpl(request, jsonEncoder, utf8StreamConverter);
+        RoutingContext(request, jsonEncoder, utf8StreamConverter);
   });
 
   group('setJsonContentType', () {
