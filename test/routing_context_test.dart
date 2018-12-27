@@ -15,6 +15,7 @@ void main() {
   MockHttpHeaders headers;
   MockJsonEncoder jsonEncoder;
   RoutingContext routingContext;
+  MockUtf8StreamConverter utf8StreamConverter;
   setUp(() {
     request = MockHttpRequest();
     response = MockHttpResponse();
@@ -22,7 +23,9 @@ void main() {
     headers = MockHttpHeaders();
     when(response.headers).thenReturn(headers);
     jsonEncoder = MockJsonEncoder();
-    routingContext = RoutingContextImpl(request, jsonEncoder);
+    utf8StreamConverter = MockUtf8StreamConverter();
+    routingContext =
+        RoutingContextImpl(request, jsonEncoder, utf8StreamConverter);
   });
 
   group('setJsonContentType', () {
@@ -39,8 +42,7 @@ void main() {
       routingContext.setJsonContentType();
       expect(
           receivedContentType.mimeType, equals(expectedContentType.mimeType));
-      expect(
-          receivedContentType.charset, equals(expectedContentType.charset));
+      expect(receivedContentType.charset, equals(expectedContentType.charset));
       expect(receivedContentType.toString(),
           equals(expectedContentType.toString()));
     });
@@ -53,7 +55,8 @@ void main() {
     });
   });
   group('okJsonResponse', () {
-    test('should set the status code to 200, convert to json and set the body', () {
+    test('should set the status code to 200, convert to json and set the body',
+        () {
       final blogPost = BlogPost(title: 'title0', content: 'content0');
       const String json = '{"title": "title0", "content": "content0"}';
       when(jsonEncoder.convert(blogPost)).thenReturn(json);
@@ -67,6 +70,16 @@ void main() {
     test('should close the response', () {
       routingContext.closeResponse();
       verify(response.close());
+    });
+  });
+
+  group('getBodyAsJson', () {
+    test('should return the body as json', () async {
+      final Map<String, dynamic> json = {'hello': 'world'};
+      when(utf8StreamConverter.streamToJson(request))
+          .thenAnswer((_) async => json);
+      final dynamic ret = await routingContext.bodyAsJson;
+      expect(ret, equals(json));
     });
   });
 }

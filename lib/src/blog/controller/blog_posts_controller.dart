@@ -5,8 +5,8 @@ import 'package:blog_backend/src/controller.dart';
 import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_common/blog_common.dart';
 
-/// Controller that returns all blog posts
-class GetBlogPostsController extends Controller {
+/// Controller for blog posts
+class BlogPostsController extends Controller {
   @override
   Future<void> get(RoutingContext routingContext) async {
     final BlogPostRepository blogPostRepository = await routingContext.blogPostRepository;

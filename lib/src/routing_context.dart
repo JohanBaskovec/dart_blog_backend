@@ -31,5 +31,8 @@ abstract class RoutingContext {
 
   /// Gets the method.
   String get method;
+
+  /// Returns the body as a JSON object.
+  Future<dynamic> get bodyAsJson;
 }
 
