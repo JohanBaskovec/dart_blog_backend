@@ -1,7 +1,7 @@
 import 'package:blog_backend/src/blog/controller/blog_posts_controller.dart';
 import 'package:blog_common/blog_common.dart';
-import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:test/test.dart';
 
 import '../../mocks.dart';
 
@@ -14,7 +14,8 @@ void main() {
     controller = BlogPostsController();
     routingContext = MockRoutingContext();
     blogPostRepository = MockBlogPostRepository();
-    when(routingContext.blogPostRepository).thenAnswer((_) async => blogPostRepository);
+    when(routingContext.blogPostRepository)
+        .thenAnswer((_) async => blogPostRepository);
   });
 
   group('get', () {
@@ -26,6 +27,15 @@ void main() {
       when(blogPostRepository.getAll()).thenAnswer((_) async => blogPosts);
       await controller.get(routingContext);
       verify(routingContext.okJsonResponse(blogPosts));
+    });
+  });
+  group('post', () {
+    test('should insert a new blog post', () async {
+      final BlogPost blogPost = MockBlogPost();
+      when(routingContext.getBodyAsObject(BlogPost.fromJson))
+          .thenAnswer((_) async => blogPost);
+      await controller.post(routingContext);
+      verify(blogPostRepository.persist(blogPost));
     });
   });
 }
