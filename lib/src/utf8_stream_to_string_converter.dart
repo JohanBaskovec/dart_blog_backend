@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-/// Converter of stream of bytes to json and objects.
+/// Converter streams of bytes to strings
 class Utf8StreamToStringConverter {
   final Utf8Decoder _utf8Decoder;
 
