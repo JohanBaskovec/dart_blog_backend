@@ -7,7 +7,9 @@ import 'package:blog_backend/src/routing/route.dart';
 import 'package:blog_backend/src/routing/route_holder.dart';
 import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
+import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_string_converter.dart';
+import 'package:blog_common/blog_common.dart';
 import 'package:mockito/mockito.dart';
 
 class MockController extends Mock implements Controller {}
@@ -37,3 +39,8 @@ class MockUtf8StreamToStringConverter extends Mock
 
 class MockUtf8StreamToJsonConverter extends Mock
     implements Utf8StreamToJsonConverter {}
+
+class MockUtf8StreamToObjectConverter extends Mock
+    implements Utf8StreamToObjectConverter {}
+
+class MockBlogPost extends Mock implements BlogPost {}

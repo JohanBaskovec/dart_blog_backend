@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
+import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:postgres/postgres.dart';
 
 /// A routing context. Wraps a dart:io HttpRequest, simplifies
@@ -13,6 +14,7 @@ class RoutingContext {
   BlogPostRepository _blogPostRepository;
   PostgreSQLConnection _connection;
   Utf8StreamToJsonConverter _utf8StreamParser;
+  Utf8StreamToObjectConverter _utf8streamToObjectConverter;
 
   // TODO: connection pool
   // TODO: transactions
@@ -24,7 +26,8 @@ class RoutingContext {
   }
 
   /// Creates a next RoutingContext from a dart:io HttpRequest
-  RoutingContext(this._request, this._jsonEncoder, this._utf8StreamParser);
+  RoutingContext(this._request, this._jsonEncoder, this._utf8StreamParser,
+      this._utf8streamToObjectConverter);
 
   /// Sets the content type to application/json utf-8
   void setJsonContentType() {
@@ -81,5 +84,10 @@ class RoutingContext {
   Future<dynamic> get bodyAsJson {
     return _utf8StreamParser.streamToJson(_request);
   }
-}
 
+  /// Converts the JSON body to an object using [conversionFunction]
+  Future<dynamic> getBodyAsObject(conversionFunction(Map<String, dynamic> o)) {
+    return _utf8streamToObjectConverter.streamToObject(
+        _request, conversionFunction);
+  }
+}

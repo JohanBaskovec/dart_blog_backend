@@ -7,6 +7,16 @@ import 'package:test/test.dart';
 
 import 'mocks.dart';
 
+class TargetObject {
+  String hello;
+
+  static TargetObject toJson(Map<String, dynamic> json) {
+    final ret = TargetObject();
+    ret.hello = json['hello'] as String;
+    return ret;
+  }
+}
+
 void main() {
   MockHttpRequest request;
   // ignore: close_sinks
@@ -14,7 +24,8 @@ void main() {
   MockHttpHeaders headers;
   MockJsonEncoder jsonEncoder;
   RoutingContext routingContext;
-  MockUtf8StreamToJsonConverter utf8StreamConverter;
+  MockUtf8StreamToJsonConverter utf8StreamToJsonConverter;
+  MockUtf8StreamToObjectConverter utf8StreamToObjectConverter;
   setUp(() {
     request = MockHttpRequest();
     response = MockHttpResponse();
@@ -22,9 +33,10 @@ void main() {
     headers = MockHttpHeaders();
     when(response.headers).thenReturn(headers);
     jsonEncoder = MockJsonEncoder();
-    utf8StreamConverter = MockUtf8StreamToJsonConverter();
-    routingContext =
-        RoutingContext(request, jsonEncoder, utf8StreamConverter);
+    utf8StreamToJsonConverter = MockUtf8StreamToJsonConverter();
+    utf8StreamToObjectConverter = MockUtf8StreamToObjectConverter();
+    routingContext = RoutingContext(request, jsonEncoder,
+        utf8StreamToJsonConverter, utf8StreamToObjectConverter);
   });
 
   group('setJsonContentType', () {
@@ -72,19 +84,24 @@ void main() {
     });
   });
 
-  group('getBodyAsJson', () {
+  group('bodyAsJson', () {
     test('should return the body as json', () async {
       final Map<String, dynamic> json = {'hello': 'world'};
-      when(utf8StreamConverter.streamToJson(request))
+      when(utf8StreamToJsonConverter.streamToJson(request))
           .thenAnswer((_) async => json);
       final dynamic ret = await routingContext.bodyAsJson;
       expect(ret, equals(json));
     });
   });
 
-  group('getBodyAsObject', () {
+  group('bodyAsObject', () {
     test('should return the body as an object', () async {
-
+      final expected = TargetObject();
+      when(utf8StreamToObjectConverter.streamToObject(
+              request, TargetObject.toJson))
+          .thenAnswer((_) async => expected);
+      final ret = await routingContext.getBodyAsObject(TargetObject.toJson);
+      expect(ret, same(expected));
     });
   });
 }
