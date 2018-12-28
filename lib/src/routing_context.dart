@@ -16,6 +16,7 @@ class RoutingContext {
 
   // TODO: connection pool
   // TODO: transactions
+  // TODO: put password and config in external file
   Future<void> _openPostgresConnection() async {
     _connection = PostgreSQLConnection('localhost', 5432, 'postgres',
         username: 'postgres', password: 'c4ef37c0fbd747da1c63c0f87d7c62df');
