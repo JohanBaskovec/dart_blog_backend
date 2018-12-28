@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
-import 'package:blog_backend/src/utf8_stream_converter.dart';
+import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:postgres/postgres.dart';
 
 /// A routing context. Wraps a dart:io HttpRequest, simplifies
@@ -12,7 +12,7 @@ class RoutingContext {
   JsonEncoder _jsonEncoder;
   BlogPostRepository _blogPostRepository;
   PostgreSQLConnection _connection;
-  Utf8StreamConverter _utf8StreamParser;
+  Utf8StreamToJsonConverter _utf8StreamParser;
 
   // TODO: connection pool
   // TODO: transactions

@@ -14,7 +14,7 @@ void main() {
   MockHttpHeaders headers;
   MockJsonEncoder jsonEncoder;
   RoutingContext routingContext;
-  MockUtf8StreamConverter utf8StreamConverter;
+  MockUtf8StreamToJsonConverter utf8StreamConverter;
   setUp(() {
     request = MockHttpRequest();
     response = MockHttpResponse();
@@ -22,7 +22,7 @@ void main() {
     headers = MockHttpHeaders();
     when(response.headers).thenReturn(headers);
     jsonEncoder = MockJsonEncoder();
-    utf8StreamConverter = MockUtf8StreamConverter();
+    utf8StreamConverter = MockUtf8StreamToJsonConverter();
     routingContext =
         RoutingContext(request, jsonEncoder, utf8StreamConverter);
   });
@@ -79,6 +79,12 @@ void main() {
           .thenAnswer((_) async => json);
       final dynamic ret = await routingContext.bodyAsJson;
       expect(ret, equals(json));
+    });
+  });
+
+  group('getBodyAsObject', () {
+    test('should return the body as an object', () async {
+
     });
   });
 }
