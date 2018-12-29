@@ -25,6 +25,8 @@ Future<void> run() async {
   final router = Router(RouteHolder([Route('/posts', getBlogPostsController)]));
   server.listen((HttpRequest request) async {
     try {
+      request.response.headers.add('Access-Control-Allow-Origin', 'http://localhost:8080');
+      request.response.headers.add('Access-Control-Allow-Credentials', 'true');
       final routingContext = RoutingContext(request, jsonEncoder,
           utf8StreamToJsonConverter, utf8StreamToObjectConverter);
       await router.routeToPath(request.uri.path, routingContext);
