@@ -17,19 +17,22 @@ void main() {
   group('getAll', () {
     test('should return all BlogPosts', () async {
       await connection.query('''delete from blog_post''');
-      await connection.query('''insert into blog_post (title, content) 
+      await connection.query('''insert into blog_post (id, title, content) 
     values 
-    ('title1', 'content1'),
-    ('title2', 'content2'),
-    ('title3', 'content3')''');
+    (1, 'title1', 'content1'),
+    (2, 'title2', 'content2'),
+    (3, 'title3', 'content3')''');
       final List<BlogPost> blogPosts = await repository.getAll();
       expect(blogPosts.length, equals(3));
       expect(blogPosts[0].title, equals('title1'));
       expect(blogPosts[0].content, equals('content1'));
+      expect(blogPosts[0].id, equals(1));
       expect(blogPosts[1].title, equals('title2'));
       expect(blogPosts[1].content, equals('content2'));
+      expect(blogPosts[1].id, equals(2));
       expect(blogPosts[2].title, equals('title3'));
       expect(blogPosts[2].content, equals('content3'));
+      expect(blogPosts[2].id, equals(3));
     });
   });
   group('persist', () {
@@ -38,23 +41,28 @@ void main() {
       final blogPost = BlogPost(title: 'title0', content: 'content0');
       await repository.persist(blogPost);
       expect(blogPost.id, isNotNull);
-      final List<Map<String, Map<String, dynamic>>> result = await connection
-          .mappedResultsQuery('''select * from blog_post''');
+      final List<Map<String, Map<String, dynamic>>> result =
+          await connection.mappedResultsQuery('''select * from blog_post''');
       expect(result.length, equals(1));
-      expect(result[0]['blog_post']['title'], equals('title0'));
-      expect(result[0]['blog_post']['content'], equals('content0'));
+      expect(result[0]['blog_post']['title'], equals(blogPost.title));
+      expect(result[0]['blog_post']['content'], equals(blogPost.content));
+      expect(result[0]['blog_post']['id'], equals(blogPost.id));
     });
     test('should update existing BlogPost', () async {
       await connection.query('''delete from blog_post''');
-      final List<List> insertResult = await connection.query(
-          '''insert into blog_post (title, content) values ('title0', 'content0') returning id''');
-      final blogPost = BlogPost(title: 'title1', content: 'content1', id: insertResult[0][0] as int);
-      await repository.persist(blogPost);
-      final List<Map<String, Map<String, dynamic>>> result = await connection
-          .mappedResultsQuery('''select * from blog_post''');
+      final List<List> insertResult =
+          await connection.query('''insert into blog_post (title, content) 
+          values ('title0', 'content0') returning id''');
+      final updatedBlogPost = BlogPost(
+          title: 'title1', content: 'content1', id: insertResult[0][0] as int);
+      await repository.persist(updatedBlogPost);
+      final List<Map<String, Map<String, dynamic>>> result =
+          await connection.mappedResultsQuery('''select * from blog_post''');
       expect(result.length, equals(1));
-      expect(result[0]['blog_post']['title'], equals('title1'));
-      expect(result[0]['blog_post']['content'], equals('content1'));
+      expect(result[0]['blog_post']['title'], equals(updatedBlogPost.title));
+      expect(
+          result[0]['blog_post']['content'], equals(updatedBlogPost.content));
+      expect(result[0]['blog_post']['id'], equals(updatedBlogPost.id));
     });
   });
 }

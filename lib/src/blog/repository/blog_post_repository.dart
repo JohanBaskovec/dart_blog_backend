@@ -18,11 +18,22 @@ class BlogPostRepository {
     final List<BlogPost> blogPosts = [];
     for (final row in results) {
       final Map<String, dynamic> blogPostRow = row['blog_post'];
-      blogPosts.add(BlogPost(
-          title: blogPostRow['title'] as String,
-          content: blogPostRow['content'] as String));
+      blogPosts.add(blogPostFromRow(blogPostRow));
     }
     return blogPosts;
+  }
+
+  /// Get one blog posts
+  Future<BlogPost> getOne(int id) async {
+    final List<Map<String, Map<String, dynamic>>> results =
+        await _connection.mappedResultsQuery('''
+      select title, content, id
+      from blog_post
+      where id=@id
+    ''', substitutionValues: {'id': id});
+    final Map<String, Map<String, dynamic>> row = results[0];
+    final Map<String, dynamic> blogPostRow = row['blog_post'];
+    return blogPostFromRow(blogPostRow);
   }
 
   /// Persists a blog post in the database. If [blogPost]'id isn't null,
@@ -42,5 +53,14 @@ class BlogPostRepository {
             'id': blogPost.id
           });
     }
+  }
+
+  BlogPost blogPostFromRow(Map<String, dynamic> row) {
+    final blogPost = BlogPost(
+        title: row['title'] as String,
+        content: row['content'] as String,
+        id: row['id'] as int
+    );
+    return blogPost;
   }
 }

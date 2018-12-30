@@ -16,6 +16,8 @@ class RoutingContext {
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
 
+  Uri get requestedUri => _request.requestedUri;
+
   // TODO: connection pool
   // TODO: transactions
   // TODO: put password and config in external file
