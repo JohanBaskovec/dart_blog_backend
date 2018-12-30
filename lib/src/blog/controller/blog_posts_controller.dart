@@ -21,5 +21,6 @@ class BlogPostsController extends Controller {
     final BlogPostRepository blogPostRepository =
         await routingContext.blogPostRepository;
     await blogPostRepository.persist(blogPost);
+    routingContext.okJsonResponse(blogPost);
   }
 }
