@@ -6,7 +6,7 @@ import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:postgres/postgres.dart';
 
-/// A routing context. Wraps a dart:io HttpRequest, simplifies
+/// A routing context. Wraps a dart:io's [HttpRequest], simplifies
 /// responding to requests and is a service locator.
 class RoutingContext {
   HttpRequest _request;
@@ -16,6 +16,7 @@ class RoutingContext {
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
 
+  /// See [HttpRequest.requestedUri]
   Uri get requestedUri => _request.requestedUri;
 
   // TODO: connection pool

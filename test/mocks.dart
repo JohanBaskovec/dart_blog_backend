@@ -43,4 +43,7 @@ class MockUtf8StreamToJsonConverter extends Mock
 class MockUtf8StreamToObjectConverter extends Mock
     implements Utf8StreamToObjectConverter {}
 
+
 class MockBlogPost extends Mock implements BlogPost {}
+
+class MockUri extends Mock implements Uri {}

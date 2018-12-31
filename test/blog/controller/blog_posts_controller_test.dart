@@ -19,14 +19,32 @@ void main() {
   });
 
   group('get', () {
-    test('should return all blog posts', () async {
+    MockUri uri;
+    Map<String, String> queryParameters;
+    setUp(() {
+      uri = MockUri();
+      queryParameters = {};
+      when(uri.queryParameters).thenReturn(queryParameters);
+      when(routingContext.requestedUri).thenReturn(uri);
+    });
+
+    test('should return all blog posts when no id is provided', () async {
       final List<BlogPost> blogPosts = [
         BlogPost(title: 'title1', content: 'content1'),
         BlogPost(title: 'title2', content: 'content2')
       ];
+      queryParameters['id'] = null;
       when(blogPostRepository.getAll()).thenAnswer((_) async => blogPosts);
       await controller.get(routingContext);
       verify(routingContext.okJsonResponse(blogPosts));
+    });
+
+    test('should return a single blog post when an id is provided', () async {
+      final BlogPost blogPost = BlogPost(title: 'title2', content: 'content2');
+      queryParameters['id'] = '5';
+      when(blogPostRepository.getOne(5)).thenAnswer((_) async => blogPost);
+      await controller.get(routingContext);
+      verify(routingContext.okJsonResponse(blogPost));
     });
   });
   group('post', () {

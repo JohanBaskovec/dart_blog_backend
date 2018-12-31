@@ -55,6 +55,7 @@ class BlogPostRepository {
     }
   }
 
+  /// Creates a BlogPost from a database row (map of row name to value)
   BlogPost blogPostFromRow(Map<String, dynamic> row) {
     final blogPost = BlogPost(
         title: row['title'] as String,
