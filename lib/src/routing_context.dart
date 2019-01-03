@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
+import 'package:blog_backend/src/typing/text_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:postgres/postgres.dart';
@@ -12,6 +13,7 @@ class RoutingContext {
   HttpRequest _request;
   JsonEncoder _jsonEncoder;
   BlogPostRepository _blogPostRepository;
+  TextRepository _textRepository;
   PostgreSQLConnection _connection;
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
@@ -64,6 +66,14 @@ class RoutingContext {
       await _openPostgresConnection();
     }
     return _blogPostRepository ??= BlogPostRepository(_connection);
+  }
+
+  /// Gets or create a [TextRepository]
+  Future<TextRepository> get textRepository async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _textRepository ??= TextRepository(_connection);
   }
 
   /// Gets a JsonEncoder

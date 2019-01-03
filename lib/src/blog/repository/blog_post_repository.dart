@@ -5,7 +5,7 @@ import 'package:postgres/postgres.dart';
 class BlogPostRepository {
   PostgreSQLConnection _connection;
 
-  /// Creates a new BlogPostRepositoryImpl
+  /// Creates a new BlogPostRepository
   BlogPostRepository(this._connection);
 
   /// Get all blog posts
