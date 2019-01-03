@@ -1,7 +1,7 @@
 create table blog_post
 (
   id serial not null
-    constraint article_pkey
+    constraint blog_post_pkey
     primary key,
   title text default ''::text,
   content text default ''::text
