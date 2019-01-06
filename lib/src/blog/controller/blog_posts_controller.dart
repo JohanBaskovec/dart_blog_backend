@@ -6,7 +6,7 @@ import 'package:blog_common/blog_common.dart';
 /// Controller for blog posts
 class BlogPostsController extends Controller {
   @override
-  String get path => '^/books';
+  String get path => '^/posts';
 
   @override
   Future<void> get(RoutingContext routingContext) async {
