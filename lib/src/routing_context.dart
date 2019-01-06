@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
+import 'package:blog_backend/src/postgres_connection_factory.dart';
 import 'package:blog_backend/src/typing/book_repository.dart';
 import 'package:blog_backend/src/typing/text_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
@@ -19,22 +20,20 @@ class RoutingContext {
   PostgreSQLConnection _connection;
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
+  PostgresConnectionFactory _postgresConnectionFactory;
 
   /// See [HttpRequest.requestedUri]
   Uri get requestedUri => _request.requestedUri;
 
-  // TODO: connection pool
-  // TODO: transactions
-  // TODO: put password and config in external file
-  Future<void> _openPostgresConnection() async {
-    _connection = PostgreSQLConnection('localhost', 5432, 'postgres',
-        username: 'postgres', password: 'c4ef37c0fbd747da1c63c0f87d7c62df');
-    await _connection.open();
-  }
-
   /// Creates a next RoutingContext from a dart:io HttpRequest
   RoutingContext(this._request, this._jsonEncoder, this._utf8StreamParser,
-      this._utf8streamToObjectConverter);
+      this._utf8streamToObjectConverter, this._postgresConnectionFactory);
+
+  // TODO: connection pool
+  // TODO: transactions
+  Future<void> _openPostgresConnection() async {
+    _connection = await _postgresConnectionFactory.newOpenConnection();
+  }
 
   /// Sets the content type to application/json utf-8
   void setJsonContentType() {
