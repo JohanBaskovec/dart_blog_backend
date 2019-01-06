@@ -1,11 +1,13 @@
+import 'package:blog_backend/src/typing/text_repository.dart';
 import 'package:blog_common/blog_common.dart';
 import 'package:postgres/postgres.dart';
 
 class BookRepository {
   PostgreSQLConnection _connection;
+  TextRepository _textRepository;
 
   /// Creates a new TextRepository
-  BookRepository(this._connection);
+  BookRepository(this._connection, this._textRepository);
 
   /// Get all books without their paragraphs.
   Future<List<Book>> getBookSummaries() async {
@@ -32,6 +34,10 @@ class BookRepository {
         'title': book.title,
       });
       book.id = queryResult[0][0] as int;
+      for (Text text in book.paragraphs) {
+        text.book = book;
+        await _textRepository.persist(text);
+      }
     } else {
       await _connection.query('''update book set title=@title id=@id''',
           substitutionValues: {'title': book.title, 'id': book.id});

@@ -35,27 +35,21 @@ class TextRepository {
     return blogPostFromRow(blogPostRow);
   }
 
-  /// Persists a text in the database. If [text]'id isn't null,
-  /// inserts a new row, otherwise update existing row.
+  /// Inserts a text in the database. Does nothing the text already exists
+  /// (texts are immutable, because it invalidates all typing result,
+  /// if you want to modify a text you must copy it)
   Future<void> persist(Text text) async {
     if (text.id == null) {
       final List<List> queryResult = await _connection.query(
-          '''insert into typist_text(title, content)
-           values(@title, @content) returning id''',
-          substitutionValues: {
-            'title': text.title,
-            'content': text.content
-          });
-      text.id = queryResult[0][0] as int;
-    } else {
-      await _connection
-          .query(
-          '''update typist_text set title=@title, content=@content where id=@id''',
+          '''insert into typist_text(title, content, book_id, index_in_book)
+           values(@title, @content, @bookId, @indexInBook) returning id''',
           substitutionValues: {
             'title': text.title,
             'content': text.content,
-            'id': text.id
+            'bookId': text.book?.id,
+            'indexInBook': text?.indexInBook
           });
+      text.id = queryResult[0][0] as int;
     }
   }
 

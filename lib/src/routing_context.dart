@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
+import 'package:blog_backend/src/typing/book_repository.dart';
 import 'package:blog_backend/src/typing/text_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
@@ -14,6 +15,7 @@ class RoutingContext {
   JsonEncoder _jsonEncoder;
   BlogPostRepository _blogPostRepository;
   TextRepository _textRepository;
+  BookRepository _bookRepository;
   PostgreSQLConnection _connection;
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
@@ -38,6 +40,11 @@ class RoutingContext {
   void setJsonContentType() {
     _request.response.headers.contentType =
         ContentType('application', 'json', charset: 'utf-8');
+  }
+
+  /// Responds with code 500.
+  void internalServerErrorResponse() {
+    _request.response.statusCode = HttpStatus.internalServerError;
   }
 
   /// Responds with a code 200.
@@ -74,6 +81,15 @@ class RoutingContext {
       await _openPostgresConnection();
     }
     return _textRepository ??= TextRepository(_connection);
+  }
+
+  /// Gets or create a [BookRepository]
+  Future<BookRepository> get bookRepository async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _bookRepository ??=
+        BookRepository(_connection, await textRepository);
   }
 
   /// Gets a JsonEncoder
