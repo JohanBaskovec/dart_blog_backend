@@ -5,6 +5,9 @@ import 'package:blog_common/blog_common.dart';
 
 class TypingTextController extends Controller {
   @override
+  String get path => '^/texts';
+
+  @override
   Future<void> get(RoutingContext routingContext) async {
     final TextRepository textRepository = await routingContext.textRepository;
     final String idString = routingContext.requestedUri.queryParameters['id'];

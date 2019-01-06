@@ -1,4 +1,5 @@
 import 'package:blog_backend/src/controller.dart';
+import 'package:blog_backend/src/routing/route.dart';
 import 'package:blog_backend/src/routing/route_holder.dart';
 import 'package:blog_backend/src/routing_context.dart';
 
@@ -8,6 +9,8 @@ class Router {
 
   /// Creates a new Router instance.
   Router(this._routeHolder);
+
+  Router.createDefault() : _routeHolder = RouteHolder([]);
 
   /// Find the first Controller that matches [path]
   /// in the routes and calls its run method.
@@ -43,5 +46,9 @@ class Router {
     } finally {
       routingContext.closeResponse();
     }
+  }
+
+  void addController(Controller controller) {
+    _routeHolder.addRoute(Route(controller.path, controller));
   }
 }

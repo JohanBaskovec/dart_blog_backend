@@ -4,6 +4,9 @@ import 'package:blog_backend/src/typing/book_repository.dart';
 import 'package:blog_common/blog_common.dart';
 
 class BookController extends Controller {
+  @override
+  String get path => '^/books';
+
   /// Saves a new book and all its paragraphs
   @override
   Future<void> post(RoutingContext routingContext) async {

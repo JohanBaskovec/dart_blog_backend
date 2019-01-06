@@ -17,4 +17,12 @@ class RouteHolder {
     }
     return null;
   }
+
+  void addRoute(Route route) {
+    _routes.add(route);
+  }
+
+  void addRoutes(List<Route> routes) {
+    _routes.addAll(routes);
+  }
 }

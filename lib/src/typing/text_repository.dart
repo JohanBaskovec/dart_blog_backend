@@ -35,9 +35,9 @@ class TextRepository {
     return blogPostFromRow(blogPostRow);
   }
 
-  /// Inserts a text in the database. Does nothing the text already exists
-  /// (texts are immutable, because it invalidates all typing result,
-  /// if you want to modify a text you must copy it)
+  /// Inserts a text in the database. Does nothing if the text already exists
+  /// (texts are immutable because it modifying them would invalidate
+  /// all typing result, if you want to modify a text you must copy it)
   Future<void> persist(Text text) async {
     if (text.id == null) {
       final List<List> queryResult = await _connection.query(
