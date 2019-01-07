@@ -25,22 +25,22 @@ Future<void> initializeData(PostgreSQLConnection postgresConnection) async {
 Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
   final textRepository = TextRepository(postgresConnection);
   await postgresConnection.query('delete from ${TextRepository.tableName}');
-  await textRepository.persist(Text('title 1', '''
-Mr. Bennet was so odd a mixture of quick parts, sarcastic humour,
-reserve, and caprice, that the experience of three-and-twenty years had
-been insufficient to make his wife understand his character. _Her_ mind
-was less difficult to develop. She was a woman of mean understanding,
-little information, and uncertain temper. When she was discontented,
-she fancied herself nervous. The business of her life was to get her
-daughters married; its solace was visiting and news.'''));
+  await textRepository.persist(Text('title 1',
+'Mr. Bennet was so odd a mixture of quick parts, sarcastic humour, '
+'reserve, and caprice, that the experience of three-and-twenty years had '
+'been insufficient to make his wife understand his character. _Her_ mind '
+'was less difficult to develop. She was a woman of mean understanding, '
+'little information, and uncertain temper. When she was discontented, '
+'she fancied herself nervous. The business of her life was to get her '
+'daughters married; its solace was visiting and news.'));
 
-  await textRepository.persist(Text('title 2', '''
-In a few days Mr. Bingley returned Mr. Bennet's visit, and sat about
-ten minutes with him in his library. He had entertained hopes of being
-admitted to a sight of the young ladies, of whose beauty he had
-heard much; but he saw only the father. The ladies were somewhat more
-fortunate, for they had the advantage of ascertaining from an upper
-window that he wore a blue coat, and rode a black horse.'''));
+  await textRepository.persist(Text('title 2',
+"In a few days Mr. Bingley returned Mr. Bennet's visit, and sat about "
+'ten minutes with him in his library. He had entertained hopes of being '
+'admitted to a sight of the young ladies, of whose beauty he had '
+'heard much; but he saw only the father. The ladies were somewhat more '
+'fortunate, for they had the advantage of ascertaining from an upper '
+'window that he wore a blue coat, and rode a black horse.'));
 }
 
 /// Run the application.
