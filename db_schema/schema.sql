@@ -60,7 +60,7 @@ create table typist_text
     primary key,
   title         text      not null,
   content       text      not null,
-  book_id       serial    not null
+  book_id       bigint
     constraint typing_text_book_id_fk
     references book,
   index_in_book int
