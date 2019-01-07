@@ -24,8 +24,7 @@ Future<void> initializeData(PostgreSQLConnection postgresConnection) async {
 /// Load test data
 Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
   final textRepository = TextRepository(postgresConnection);
-  await postgresConnection.query(
-      'delete from ${TextRepository.tableName}');
+  await postgresConnection.query('delete from ${TextRepository.tableName}');
   await textRepository.persist(Text('title 1', '''
 Mr. Bennet was so odd a mixture of quick parts, sarcastic humour,
 reserve, and caprice, that the experience of three-and-twenty years had
@@ -54,7 +53,7 @@ Future<void> run() async {
       return;
     }
     final String configurationFileContent =
-    configurationFile.readAsStringSync();
+        configurationFile.readAsStringSync();
     final config = loadYaml(configurationFileContent);
     final int backendPort = config['backend_port'];
     final postgresConnectionFactory = PostgresConnectionFactory(
@@ -65,7 +64,7 @@ Future<void> run() async {
         config['db_password'] as String);
 
     final PostgreSQLConnection postgresConnection =
-    await postgresConnectionFactory.newOpenConnection();
+        await postgresConnectionFactory.newOpenConnection();
 
     if (config['load_fixtures'] as bool) {
       await loadFixtures(postgresConnection);
@@ -74,7 +73,7 @@ Future<void> run() async {
     await postgresConnection.close();
 
     final HttpServer server =
-    await HttpServer.bind(InternetAddress.anyIPv6, backendPort);
+        await HttpServer.bind(InternetAddress.anyIPv6, backendPort);
     print('Listening on http://localhost:$backendPort.');
     final blogPostsController = BlogPostsController();
     final randomTextController = RandomTextController();
@@ -82,11 +81,11 @@ Future<void> run() async {
     final bookController = BookController();
     const utf8Decoder = Utf8Decoder();
     const utf8StreamToStringConverter =
-    Utf8StreamToStringConverter(utf8Decoder);
+        Utf8StreamToStringConverter(utf8Decoder);
     const utf8StreamToJsonConverter =
-    Utf8StreamToJsonConverter(utf8StreamToStringConverter);
+        Utf8StreamToJsonConverter(utf8StreamToStringConverter);
     const utf8StreamToObjectConverter =
-    Utf8StreamToObjectConverter(utf8StreamToJsonConverter);
+        Utf8StreamToObjectConverter(utf8StreamToJsonConverter);
     const JsonEncoder jsonEncoder = JsonEncoder();
     final router = Router.createDefault();
     router.addController(blogPostsController);
@@ -95,8 +94,8 @@ Future<void> run() async {
     router.addController(randomTextController);
     server.listen((HttpRequest request) async {
       try {
-        request.response.headers
-            .add('Access-Control-Allow-Origin', config['frontend_url']);
+        request.response.headers.add('Access-Control-Allow-Origin',
+            '${config["frontend_host"]}:${config["frontend_port"]}');
         request.response.headers
             .add('Access-Control-Allow-Credentials', 'true');
         final routingContext = RoutingContext(
