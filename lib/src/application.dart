@@ -6,6 +6,7 @@ import 'package:blog_backend/src/postgres_connection_factory.dart';
 import 'package:blog_backend/src/routing/router.dart';
 import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_backend/src/typing/book_controller.dart';
+import 'package:blog_backend/src/typing/random_text_controller.dart';
 import 'package:blog_backend/src/typing/text_repository.dart';
 import 'package:blog_backend/src/typing/typing_text_controller.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
@@ -15,13 +16,16 @@ import 'package:blog_common/blog_common.dart';
 import 'package:postgres/postgres.dart';
 import 'package:yaml/yaml.dart';
 
-/// Load test data
-Future<void> loadFixtures(
-    PostgresConnectionFactory postgresConnectionFactory) async {
-  final PostgreSQLConnection connection =
-      await postgresConnectionFactory.newOpenConnection();
+Future<void> initializeData(PostgreSQLConnection postgresConnection) async {
+  final textRepository = TextRepository(postgresConnection);
+  await textRepository.initializeCache();
+}
 
-  final textRepository = TextRepository(connection);
+/// Load test data
+Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
+  final textRepository = TextRepository(postgresConnection);
+  await postgresConnection.query(
+      'delete from ${TextRepository.tableName}');
   await textRepository.persist(Text('title 1', '''
 Mr. Bennet was so odd a mixture of quick parts, sarcastic humour,
 reserve, and caprice, that the experience of three-and-twenty years had
@@ -38,7 +42,6 @@ admitted to a sight of the young ladies, of whose beauty he had
 heard much; but he saw only the father. The ladies were somewhat more
 fortunate, for they had the advantage of ascertaining from an upper
 window that he wore a blue coat, and rode a black horse.'''));
-  await connection.close();
 }
 
 /// Run the application.
@@ -51,7 +54,7 @@ Future<void> run() async {
       return;
     }
     final String configurationFileContent =
-        configurationFile.readAsStringSync();
+    configurationFile.readAsStringSync();
     final config = loadYaml(configurationFileContent);
     final int backendPort = config['backend_port'];
     final postgresConnectionFactory = PostgresConnectionFactory(
@@ -60,27 +63,36 @@ Future<void> run() async {
         config['db_name'] as String,
         config['db_username'] as String,
         config['db_password'] as String);
+
+    final PostgreSQLConnection postgresConnection =
+    await postgresConnectionFactory.newOpenConnection();
+
     if (config['load_fixtures'] as bool) {
-      await loadFixtures(postgresConnectionFactory);
+      await loadFixtures(postgresConnection);
     }
+    await initializeData(postgresConnection);
+    await postgresConnection.close();
+
     final HttpServer server =
-        await HttpServer.bind(InternetAddress.anyIPv6, backendPort);
+    await HttpServer.bind(InternetAddress.anyIPv6, backendPort);
     print('Listening on http://localhost:$backendPort.');
     final blogPostsController = BlogPostsController();
+    final randomTextController = RandomTextController();
     final textController = TypingTextController();
     final bookController = BookController();
     const utf8Decoder = Utf8Decoder();
     const utf8StreamToStringConverter =
-        Utf8StreamToStringConverter(utf8Decoder);
+    Utf8StreamToStringConverter(utf8Decoder);
     const utf8StreamToJsonConverter =
-        Utf8StreamToJsonConverter(utf8StreamToStringConverter);
+    Utf8StreamToJsonConverter(utf8StreamToStringConverter);
     const utf8StreamToObjectConverter =
-        Utf8StreamToObjectConverter(utf8StreamToJsonConverter);
+    Utf8StreamToObjectConverter(utf8StreamToJsonConverter);
     const JsonEncoder jsonEncoder = JsonEncoder();
     final router = Router.createDefault();
     router.addController(blogPostsController);
     router.addController(textController);
     router.addController(bookController);
+    router.addController(randomTextController);
     server.listen((HttpRequest request) async {
       try {
         request.response.headers
