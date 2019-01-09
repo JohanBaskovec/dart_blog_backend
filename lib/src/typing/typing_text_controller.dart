@@ -18,7 +18,11 @@ class TypingTextController extends Controller {
       final id = int.parse(idString);
       if (id != null) {
         final Text text = await textRepository.getOne(id);
-        routingContext.okJsonResponse(text);
+        if (text == null) {
+          routingContext.notFoundResponse();
+        } else {
+          routingContext.okJsonResponse(text);
+        }
       }
     }
   }

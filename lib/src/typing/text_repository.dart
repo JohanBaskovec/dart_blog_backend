@@ -41,15 +41,22 @@ class TextRepository {
       from typist_text
       where id=@id
     ''', substitutionValues: {'id': id});
+      if (results.isEmpty) {
+        return null;
+      }
       final Map<String, Map<String, dynamic>> row = results[0];
       final Map<String, dynamic> textRow = row['typist_text'];
       final Text text = textFromRow(textRow);
-      if (_textsCache.length < id + 1) {
-        _textsCache.length = id * 2;
-      }
-      _textsCache[id] = text;
+      addTextInCache(text);
       return text;
     }
+  }
+
+  void addTextInCache(Text text) {
+    if (_textsCache.length < text.id + 1) {
+      _textsCache.length = text.id * 2;
+    }
+    _textsCache[text.id] = text;
   }
 
   Future<Text> getOneRandom() async {
@@ -59,7 +66,7 @@ class TextRepository {
   /// Loads all the text in memory.
   Future<void> initializeCache() async {
     final List<Text> texts = await getAll();
-    _textsCache.addAll(texts);
+    texts.forEach(addTextInCache);
   }
 
   /// Inserts a text in the database. Does nothing if the text already exists
