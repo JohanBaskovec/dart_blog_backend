@@ -39,7 +39,7 @@ class BookRepository {
         await _textRepository.persist(text);
       }
     } else {
-      await _connection.query('''update book set title=@title id=@id''',
+      await _connection.query('''update book set title=@title where id=@id''',
           substitutionValues: {'title': book.title, 'id': book.id});
     }
   }

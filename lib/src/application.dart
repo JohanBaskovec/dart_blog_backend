@@ -8,7 +8,9 @@ import 'package:blog_backend/src/routing_context.dart';
 import 'package:blog_backend/src/typing/book_controller.dart';
 import 'package:blog_backend/src/typing/random_text_controller.dart';
 import 'package:blog_backend/src/typing/text_repository.dart';
+import 'package:blog_backend/src/typing/typing_statistics_controller.dart';
 import 'package:blog_backend/src/typing/typing_text_controller.dart';
+import 'package:blog_backend/src/user/user_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_string_converter.dart';
@@ -21,9 +23,11 @@ Future<void> initializeData(PostgreSQLConnection postgresConnection) async {
   await textRepository.initializeCache();
 }
 
+// TODO: move to separate executable, merge with database schema upgrade code
 /// Load test data
 Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
   final textRepository = TextRepository(postgresConnection);
+  await postgresConnection.query('delete from text_wpm');
   await postgresConnection.query('delete from ${TextRepository.tableName}');
   await textRepository.persist(Text('title 1',
 'Mr. Bennet was so odd a mixture of quick parts, sarcastic humour, '
@@ -43,6 +47,11 @@ Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
 'window that he wore a blue coat, and rode a black horse.'));
 
   await textRepository.persist(Text('title 3', 'short text.'));
+
+  await postgresConnection.query('delete from ${UserRepository.tableName}');
+  final userRepository = UserRepository(postgresConnection);
+  final adminUser = User('admin', 'email', 'password');
+  await userRepository.persist(adminUser);
 }
 
 /// Run the application.
@@ -94,6 +103,7 @@ Future<void> run() async {
     router.addController(textController);
     router.addController(bookController);
     router.addController(randomTextController);
+    router.addController(TypingStatisticsController());
     server.listen((HttpRequest request) async {
       try {
         request.response.headers.add('Access-Control-Allow-Origin',

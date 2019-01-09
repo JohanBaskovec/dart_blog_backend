@@ -68,3 +68,54 @@ create table typist_text
 
 alter table typist_text
   owner to postgres;
+
+create table text_wpm
+(
+  id      bigserial not null
+    constraint text_wpm_pkey
+    primary key,
+  wpm     decimal,
+  text_id bigint
+    constraint text_wpm_text_id_fk
+    references typist_text,
+  user_id bigint
+    constraint text_wpm_user_id_fk
+    references typist_user
+);
+
+alter table text_wpm
+  owner to postgres;
+
+create table word_wpm
+(
+  id      bigserial not null
+    constraint word_wpm_pkey
+    primary key,
+  wpm     decimal,
+  text_wpm_id bigint
+    constraint word_wpm_text_wpm_id_fk
+    references text_wpm,
+  user_id bigint
+    constraint word_wpm_user_id_fk
+    references typist_user
+);
+
+alter table word_wpm
+  owner to postgres;
+
+create table letter_wpm
+(
+  id      bigserial not null
+    constraint letter_wpm_pkey
+    primary key,
+  wpm     decimal,
+  text_wpm_id bigint
+    constraint letter_wpm_text_wpm_id_fk
+    references text_wpm,
+  user_id bigint
+    constraint letter_wpm_user_id_fk
+    references typist_user
+);
+
+alter table letter_wpm
+  owner to postgres;

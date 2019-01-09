@@ -5,6 +5,7 @@ import 'package:blog_backend/src/blog/repository/blog_post_repository.dart';
 import 'package:blog_backend/src/postgres_connection_factory.dart';
 import 'package:blog_backend/src/typing/book_repository.dart';
 import 'package:blog_backend/src/typing/text_repository.dart';
+import 'package:blog_backend/src/user/user_repository.dart';
 import 'package:blog_backend/src/utf8_stream_to_json_converter.dart';
 import 'package:blog_backend/src/utf8_stream_to_object_converter.dart';
 import 'package:postgres/postgres.dart';
@@ -17,6 +18,7 @@ class RoutingContext {
   BlogPostRepository _blogPostRepository;
   TextRepository _textRepository;
   BookRepository _bookRepository;
+  UserRepository _userRepository;
   PostgreSQLConnection _connection;
   Utf8StreamToJsonConverter _utf8StreamParser;
   Utf8StreamToObjectConverter _utf8streamToObjectConverter;
@@ -91,6 +93,13 @@ class RoutingContext {
         BookRepository(_connection, await textRepository);
   }
 
+  Future<UserRepository> get userRepository async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _userRepository ??= UserRepository(_connection);
+  }
+
   /// Gets a JsonEncoder
   JsonEncoder get jsonEncoder => _jsonEncoder;
 
@@ -100,6 +109,11 @@ class RoutingContext {
   /// Responds with code 404.
   void notFoundResponse() {
     _request.response.statusCode = HttpStatus.notFound;
+  }
+
+  /// Responds with code 201.
+  void createdResponse() {
+    _request.response.statusCode = HttpStatus.created;
   }
 
   /// Attempts to convert [objects] to JSON and respond with a code 200.
@@ -117,5 +131,12 @@ class RoutingContext {
   Future<dynamic> getBodyAsObject(conversionFunction(Map<String, dynamic> o)) {
     return _utf8streamToObjectConverter.streamToObject(
         _request, conversionFunction);
+  }
+
+  Future<PostgreSQLConnection> get sqlConnection async {
+    if (_connection == null) {
+      await _openPostgresConnection();
+    }
+    return _connection;
   }
 }
