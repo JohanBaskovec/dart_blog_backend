@@ -41,6 +41,8 @@ Future<void> loadFixtures(PostgreSQLConnection postgresConnection) async {
 'heard much; but he saw only the father. The ladies were somewhat more '
 'fortunate, for they had the advantage of ascertaining from an upper '
 'window that he wore a blue coat, and rode a black horse.'));
+
+  await textRepository.persist(Text('title 3', 'short text.'));
 }
 
 /// Run the application.
